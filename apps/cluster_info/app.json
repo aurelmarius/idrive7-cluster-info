@@ -82,57 +82,155 @@
       ]
     },
     {
+      "key": "clusterLayer",
+      "label": "Panel on the cluster: drawn on",
+      "type": "choice",
+      "default": "map",
+      "options": [
+        [
+          "map",
+          "The map's area (the middle of the cluster)"
+        ],
+        [
+          "panel",
+          "The whole cluster (can go above the map, where eDrive's logo is)"
+        ]
+      ]
+    },
+    {
       "key": "nudgeY",
-      "label": "Panel on the cluster: move up (-) / down (+)",
-      "type": "number",
-      "unit": "px",
-      "default": 0,
-      "markDefault": true,
-      "steps": [
-        0,
-        -8,
-        -16,
-        -24,
-        -32,
-        -40,
-        -48,
-        -56,
-        -64,
-        8,
-        16,
-        24,
-        32,
-        40,
-        48,
-        56,
-        64
+      "label": "Panel on the cluster: up / down",
+      "type": "choice",
+      "default": "0",
+      "options": [
+        [
+          "0",
+          "as placed"
+        ],
+        [
+          "-8",
+          "up 8 px"
+        ],
+        [
+          "-16",
+          "up 16 px"
+        ],
+        [
+          "-24",
+          "up 24 px"
+        ],
+        [
+          "-32",
+          "up 32 px"
+        ],
+        [
+          "-48",
+          "up 48 px"
+        ],
+        [
+          "-64",
+          "up 64 px"
+        ],
+        [
+          "-80",
+          "up 80 px"
+        ],
+        [
+          "-96",
+          "up 96 px"
+        ],
+        [
+          "-112",
+          "up 112 px"
+        ],
+        [
+          "-128",
+          "up 128 px"
+        ],
+        [
+          "-144",
+          "up 144 px"
+        ],
+        [
+          "-160",
+          "up 160 px"
+        ],
+        [
+          "8",
+          "down 8 px"
+        ],
+        [
+          "16",
+          "down 16 px"
+        ],
+        [
+          "24",
+          "down 24 px"
+        ],
+        [
+          "32",
+          "down 32 px"
+        ],
+        [
+          "48",
+          "down 48 px"
+        ],
+        [
+          "64",
+          "down 64 px"
+        ]
       ]
     },
     {
       "key": "nudgeX",
-      "label": "Panel on the cluster: move left (-) / right (+)",
-      "type": "number",
-      "unit": "px",
-      "default": 0,
-      "markDefault": true,
-      "steps": [
-        0,
-        -16,
-        -32,
-        -48,
-        -64,
-        -80,
-        -96,
-        -112,
-        -128,
-        16,
-        32,
-        48,
-        64,
-        80,
-        96,
-        112,
-        128
+      "label": "Panel on the cluster: left / right",
+      "type": "choice",
+      "default": "0",
+      "options": [
+        [
+          "0",
+          "as placed"
+        ],
+        [
+          "-20",
+          "left 20 px"
+        ],
+        [
+          "-40",
+          "left 40 px"
+        ],
+        [
+          "-80",
+          "left 80 px"
+        ],
+        [
+          "-120",
+          "left 120 px"
+        ],
+        [
+          "-160",
+          "left 160 px"
+        ],
+        [
+          "20",
+          "right 20 px"
+        ],
+        [
+          "40",
+          "right 40 px"
+        ],
+        [
+          "80",
+          "right 80 px"
+        ],
+        [
+          "120",
+          "right 120 px"
+        ],
+        [
+          "160",
+          "right 160 px"
+        ]
       ]
     },
     {

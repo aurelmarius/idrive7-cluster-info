@@ -191,7 +191,19 @@ class FakeCR extends EventEmitter {
         assert.strictEqual(l.x, b.x + 16, JSON.stringify(l));
         assert(ov.shown());
     });
-    settings.v.nudgeY = 0; settings.v.nudgeX = 0;
+    settings.v.clusterLayer = 'panel'; settings.v.nudgeY = '-96'; settings.v.nudgeX = '0'; t += 300; ov._tick();
+    check('drawn on the whole cluster: a panel layer over the map\'s place, nudged above the map (eDrive\'s logo)', () => {
+        const l = [...cr.layers.values()][0], r = mapRect('panel', 0), b = badgeRect(r, 'top', 'panel', 0, true);
+        assert.strictEqual(l.target, 'panel');
+        assert.strictEqual(l.klass, 'overlay');
+        assert.strictEqual(l.x, b.x, 'centred as over the map');
+        assert.strictEqual(l.y, b.y - 96, JSON.stringify(l));
+        assert(l.y < r.y, 'above the map\'s area');
+        assert(ov.shown());
+    });
+    settings.v.nudgeY = '-999'; t += 300; ov._tick();
+    check('nudged too far: held at the top of the cluster', () => assert.strictEqual([...cr.layers.values()][0].y, 0));
+    settings.v.clusterLayer = 'map'; settings.v.nudgeY = 0; settings.v.nudgeX = 0;
     settings.v.place = 'bottom'; t += 300; ov._tick();
     settings.v.show = 'hud'; t += 300; ov._tick();
     check('Always on the HUD, the map on the cluster: the panel where it is with the map on the HUD (its 70 % size), not moved up', () => {

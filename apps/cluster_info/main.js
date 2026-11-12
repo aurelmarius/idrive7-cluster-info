@@ -85,7 +85,7 @@ mgu.run({
          * The head unit's current user account (SessionManager.currentUserAccountReference: a getter only, read
          * every 5 s). Each driver keeps their own PROFILE_KEYS in profiles.json: a change is kept for the driver at
          * the time, and a driver seen again gets theirs back; one seen for the first time keeps what is set. */
-        const PROFILE_KEYS = ['show', 'place', 'nudgeY', 'nudgeX', 'slot1', 'slot2', 'slot3', 'bar', 'turnSignals', 'hudBrightness', 'nightDim'];
+        const PROFILE_KEYS = ['show', 'place', 'clusterLayer', 'nudgeY', 'nudgeX', 'slot1', 'slot2', 'slot3', 'bar', 'turnSignals', 'hudBrightness', 'nightDim'];
         const PROFILE_FILE = path.join(ctx.dataDir, 'profiles.json');
         let profiles = {}, applying = false;
         try { profiles = JSON.parse(fs.readFileSync(PROFILE_FILE, 'utf8')) || {}; } catch (e) { /* none yet */ }

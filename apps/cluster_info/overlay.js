@@ -326,7 +326,12 @@ function startOverlay(ctx, lv, opts) {
     const place = () => {
         // (the HUD size chosen in Waze on cluster, even while its map is on the cluster: the panel stays put)
         if (onHud()) return { target: 'hud', pct: map.pct, hx: map.hx, hy: map.hy };
-        return map.showing ? { target: map.target, pct: map.pct, hx: map.hx, hy: map.hy } : null;
+        if (!map.showing) return null;
+        // the map in the cluster's middle (map, 1088x480), the panel drawn on the whole cluster (setting clusterLayer
+        // 'panel': 1920x720 over the gauges, transparent around the panel, as the TVH card is): the same place over
+        // the map, and moved by the nudge past it, up to the top of the cluster (where eDrive's logo is)
+        const tg = map.target === 'map' && settings.get('clusterLayer') === 'panel' ? 'panel' : map.target;
+        return { target: tg, pct: map.pct, hx: map.hx, hy: map.hy };
     };
     let CR = opts.ClusterRender;
     let cr = null, ref = 0, geo = '', cv = null, last = null, visible = false, lastT = 0, lastKey = '';
