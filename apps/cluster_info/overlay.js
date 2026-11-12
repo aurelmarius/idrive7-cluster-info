@@ -176,6 +176,18 @@ function badgeRect(r, where, target, extras, hasPower, underOn) {
     return { x, y, w, h, ph };
 }
 
+/** The badge b moved by the driver's own nudge (settings nudgeX, nudgeY: pixels, + right / down), on the cluster
+ *  only (the HUD keeps its own limits: the speed readout, what it shows): held inside the target's scene. */
+function nudge(b, target, dx, dy) {
+    const sc = SCENES[target];
+    dx = Math.round(Number(dx) || 0); dy = Math.round(Number(dy) || 0);
+    if (!sc || target === 'hud' || (!dx && !dy)) return b;
+    return Object.assign({}, b, {
+        x: Math.max(0, Math.min(sc[0] - b.w, b.x + dx)),
+        y: Math.max(0, Math.min(sc[1] - b.h, b.y + dy)),
+    });
+}
+
 /**
  * Draws the panel: dark rounded backdrop; with pw (the power) the kW right-aligned, "kW", then the bar (regen
  * left, use right); then the extra values, each a small label over its value. Without pw: the values alone.
@@ -366,7 +378,8 @@ function startOverlay(ctx, lv, opts) {
         const pl = place();
         const r = pl && mapRect(pl.target, pl.pct, pl.hx, pl.hy);
         if (!r) return 0;
-        const b = badgeRect(r, where(), pl.target, nExtras, hasPower, !!(lv.underOn && lv.underOn(pl.target)));
+        const b = nudge(badgeRect(r, where(), pl.target, nExtras, hasPower, !!(lv.underOn && lv.underOn(pl.target))),
+            pl.target, settings.get('nudgeX'), settings.get('nudgeY'));
         const key = [pl.target, b.x, b.y, b.w, b.h, b.ph].join(',');
         if (key === geo && ref) return ref;
         if (!client()) return 0;
@@ -500,4 +513,4 @@ function startOverlay(ctx, lv, opts) {
     };
 }
 
-module.exports = { startOverlay, mapRect, badgeRect, drawBadge, drawArrow, changed, parseStatus, underStrip };
+module.exports = { startOverlay, mapRect, badgeRect, nudge, drawBadge, drawArrow, changed, parseStatus, underStrip };

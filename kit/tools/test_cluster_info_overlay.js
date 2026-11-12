@@ -18,7 +18,7 @@ Module._load = function (req, parent, isMain) {
     if (req.startsWith('./kit/')) return load.call(this, path.join(KIT, req.slice(6)), parent, isMain);
     return load.call(this, req, parent, isMain);
 };
-const { startOverlay, mapRect, badgeRect, drawBadge, changed, parseStatus, underStrip } = require(path.join(ROOT, 'apps', 'cluster_info', 'overlay.js'));
+const { startOverlay, mapRect, badgeRect, nudge, drawBadge, changed, parseStatus, underStrip } = require(path.join(ROOT, 'apps', 'cluster_info', 'overlay.js'));
 const { Canvas } = require(path.join(KIT, 'canvas'));
 const themes = require(path.join(KIT, 'themes'));
 const theme = themes.theme('m_tricolour');
@@ -48,6 +48,21 @@ check('badge inside the map, bottom and top', () => {
     })));
     assert.deepStrictEqual(badgeRect(mapRect('map', 0), 'bottom', 'map'), { x: 440, y: 376, w: 208, h: 72, ph: 72 });   // 1.3x, near the map's bottom (below the car's arrow, above the dimmed edge)
     assert.deepStrictEqual(badgeRect(mapRect('hud', 0), 'bottom', 'hud'), { x: 449, y: 276, w: 172, h: 60, ph: 60 });   // the HUD's, at the map's right edge
+});
+
+check('nudge: the cluster panel moved by the settings, held inside the scene; the HUD left alone', () => {
+    const b = badgeRect(mapRect('map', 0), 'top', 'map');
+    assert.deepStrictEqual(nudge(b, 'map', 0, 0), b);
+    assert.strictEqual(nudge(b, 'map', 0, -16).y, b.y - 16, 'up');
+    assert.strictEqual(nudge(b, 'map', 32, 0).x, b.x + 32, 'right');
+    assert.strictEqual(nudge(b, 'map', 0, -999).y, 0, 'no higher than the top of the map');
+    assert.strictEqual(nudge(b, 'map', 0, 999).y, 480 - b.h, 'no lower than its bottom');
+    assert.strictEqual(nudge(b, 'map', -9999, 0).x, 0);
+    const p = badgeRect(mapRect('panel', 0), 'top', 'panel');
+    assert.strictEqual(nudge(p, 'panel', 0, -64).y, p.y - 64, 'the whole cluster: past the map, up to its top');
+    const h = badgeRect(mapRect('hud', 70), 'bottom', 'hud', 1);
+    assert.deepStrictEqual(nudge(h, 'hud', 40, -40), h);
+    assert.deepStrictEqual(nudge(b, 'map', undefined, '-8'), Object.assign({}, b, { y: b.y - 8 }), 'a setting read as text');
 });
 
 /* ---------- drawing and diffs ---------- */
@@ -166,6 +181,18 @@ class FakeCR extends EventEmitter {
     settings.v.place = 'bottom';
     write({ state: 'showing', target: 'map', hud_width_pct: 70 });
     await step();
+    settings.v.place = 'top'; t += 300; ov._tick();
+    const topY = [...cr.layers.values()][0].y;
+    settings.v.nudgeY = -24; settings.v.nudgeX = 16; t += 300; ov._tick();
+    check('nudged on the cluster: a new layer 24 px higher and 16 px right', () => {
+        const l = [...cr.layers.values()][0], b = badgeRect(mapRect('map', 0), 'top', 'map', 0, true);
+        assert.strictEqual(l.target, 'map');
+        assert.strictEqual(l.y, topY - 24, JSON.stringify(l));
+        assert.strictEqual(l.x, b.x + 16, JSON.stringify(l));
+        assert(ov.shown());
+    });
+    settings.v.nudgeY = 0; settings.v.nudgeX = 0;
+    settings.v.place = 'bottom'; t += 300; ov._tick();
     settings.v.show = 'hud'; t += 300; ov._tick();
     check('Always on the HUD, the map on the cluster: the panel where it is with the map on the HUD (its 70 % size), not moved up', () => {
         const l = [...cr.layers.values()][0], b = badgeRect(mapRect('hud', 70), 'bottom', 'hud', 0, true);
