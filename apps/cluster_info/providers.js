@@ -21,6 +21,7 @@ const path = require('path');
 const DIR = process.env.CLUSTER_INFO_DIR || '/dev/shm/cluster-info';   // (the variable: tests)
 const STALE_MS = 3000;
 const WANTED = 'wanted.json';
+const EDRIVE_WANTED = process.env.EDRIVE_WANTED || '/tmp/mgu-edrive-wanted.json';   // (the variable: tests)
 
 function startProviders(log, opts) {
     opts = opts || {};
@@ -82,6 +83,16 @@ function startProviders(log, opts) {
             fs.writeFileSync(tmp, JSON.stringify(Object.assign({ t: now() }, what)), { mode: 0o644 });
             fs.renameSync(tmp, f);
         } catch (e) { /* the folder went: made again next time */ ready = false; }
+        /* cauliflowermossgrape's eDrive (it reads a G20 330e's battery) reads the battery's charge for another app
+         * only when asked in its own file, { t, soc } (its live.js WANTED); power is asked for in our folder, so the
+         * file says soc alone (with power in it, eDrive would no longer look at our folder and write its file here) */
+        if (Array.isArray(what.values) && what.values.indexOf('soc') >= 0) {
+            const e = opts.edriveWanted || EDRIVE_WANTED, et = e + '.' + process.pid + '.tmp';
+            try {
+                fs.writeFileSync(et, JSON.stringify({ t: now(), soc: true }), { mode: 0o644 });
+                fs.renameSync(et, e);
+            } catch (err) { try { fs.unlinkSync(et); } catch (x) { /* none */ } }   // (another app's file: left alone)
+        }
     }
     /* A provider's new file is seen at once (the folder watched: a rename over the file), not at the next scan;
      * the scan every scanMs stays for a folder that can't be watched. */

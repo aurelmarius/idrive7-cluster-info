@@ -14,6 +14,7 @@ const Module = require('module');
 const ROOT = path.join(__dirname, '..', '..'), KIT = path.join(ROOT, 'kit', 'runtime');
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ci-'));
 process.env.CLUSTER_INFO_DIR = path.join(tmp, 'cluster-info');
+process.env.EDRIVE_WANTED = path.join(tmp, 'mgu-edrive-wanted.json');
 process.env.WOC_STATUS = path.join(tmp, 'woc', 'status.json');
 fs.mkdirSync(path.dirname(process.env.WOC_STATUS));
 fs.writeFileSync(process.env.WOC_STATUS, JSON.stringify({ state: 'showing', target: 'map', hud_width_pct: 0 }));
@@ -68,6 +69,10 @@ const check = (name, fn) => { fn(); ok++; console.log('ok   ' + name); };
         check('battery charge without the kW meter: power still asked for; engine values alone: not', () => {
             assert(a.power === true && a.values.indexOf('soc') >= 0, JSON.stringify(a));
             assert(b.power === false, JSON.stringify(b));
+        });
+        check('battery charge chosen: eDrive (cauliflowermossgrape) asked for it in its own file, soc alone', () => {
+            const e = JSON.parse(fs.readFileSync(process.env.EDRIVE_WANTED, 'utf8'));
+            assert(e.soc === true && !('power' in e) && typeof e.t === 'number', JSON.stringify(e));
         });
         await sleep(1100);
     }
