@@ -7,7 +7,10 @@ A small panel of live values over the Waze map in the instrument cluster or on t
   engine speed and torque, the turn signals, day / night (the HUD
   panel and arrows are dimmer at night), the driver profile (each driver keeps their own settings).
 - **Values from other apps:** eDrive Live provides the battery's power (the kW meter and its bar) and the
-  battery temperature. Any app can add values the same way. Optionally (Settings > Thin kW bar along the
+  battery temperature. eDrive in [cauliflowermossgrape/idrive7-apps](https://github.com/cauliflowermossgrape/idrive7-apps)
+  provides the power, the battery's charge and its temperature too (it reads the battery on cars eDrive Live
+  doesn't, a G20 330e among them); it answers only while the power is asked for, so the panel asks for it
+  whenever the battery's charge or temperature is chosen, with or without the kW meter. Any app can add values the same way. Optionally (Settings > Thin kW bar along the
   bottom) a slim centre-zero kW bar runs just under the panel, clear of its values, the width of all three
   slots (whether or not one of them is the kW meter): use to the right, recuperation to the left in green.
 - **Where:** where the Waze map is (cluster or HUD), or always on the HUD; at the bottom or top of the map.

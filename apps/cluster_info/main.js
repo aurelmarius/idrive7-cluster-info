@@ -23,6 +23,7 @@ const IND = require('./indicators');
 const W = 1600, H = 520;
 const GO = '#2fd27a';
 const IDLE_KW = 0.3;
+const BATTERY_VALUES = ['soc', 'battery'];   // the high-voltage battery's, from an app (eDrive Live, eDrive)
 const VALUES = {
     battery: { label: 'BATT', what: 'battery temperature' },
     oil: { label: 'OIL', what: 'engine oil temperature' },
@@ -191,7 +192,9 @@ mgu.run({
             },
             /** The kW meter's slot (0-2 among the slots in use; values with a lower slot go before it). */
             powerAt() { return Math.max(0, slots().indexOf('power')); },
-            keepFast() { if (!awake.off()) providers.want({ power: slots().indexOf('power') >= 0 || (settings.get('underline') || 'off') !== 'off', values: chosen() }); },
+            /* power asked for with the battery's charge or temperature too: cauliflowermossgrape's eDrive (the one that
+             * reads a G20 330e's battery) writes its file here only while power is wanted, values or not (Nov 2026) */
+            keepFast() { if (!awake.off()) providers.want({ power: slots().indexOf('power') >= 0 || (settings.get('underline') || 'off') !== 'off' || chosen().some((k) => BATTERY_VALUES.indexOf(k) >= 0), values: chosen() }); },
             indicator: () => live.indicator,
             night: () => live.night === true,
         };

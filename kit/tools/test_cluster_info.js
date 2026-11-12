@@ -55,6 +55,22 @@ const check = (name, fn) => { fn(); ok++; console.log('ok   ' + name); };
         const w = JSON.parse(fs.readFileSync(path.join(dir, 'wanted.json'), 'utf8'));
         assert(w.power === true && w.values.indexOf('battery') >= 0 && w.values.indexOf('oil') >= 0, JSON.stringify(w));
     });
+    {
+        // no kW meter, the battery's charge chosen: power asked for all the same (cauliflowermossgrape's eDrive
+        // writes its file only then); oil and coolant alone: not
+        const keep = { slot1: S.slot1, slot2: S.slot2, slot3: S.slot3 };
+        const read = async () => { await sleep(1100); return JSON.parse(fs.readFileSync(path.join(dir, 'wanted.json'), 'utf8')); };
+        Object.assign(S, { slot1: 'soc', slot2: 'oil', slot3: 'coolant' });
+        const a = await read();
+        Object.assign(S, { slot1: 'boost', slot2: 'oil', slot3: 'coolant' });
+        const b = await read();
+        Object.assign(S, keep);
+        check('battery charge without the kW meter: power still asked for; engine values alone: not', () => {
+            assert(a.power === true && a.values.indexOf('soc') >= 0, JSON.stringify(a));
+            assert(b.power === false, JSON.stringify(b));
+        });
+        await sleep(1100);
+    }
 
     // a provider beside it, as eDrive Live is on the car: it writes its file in the documented format
     // (providers.js) while wanted.json is fresh, replacing it whole, and removes it when the panel goes
