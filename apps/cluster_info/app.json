@@ -78,6 +78,10 @@
         [
           "top",
           "Top of the map"
+        ],
+        [
+          "cluster",
+          "Top of the cluster, where eDrive's logo is (cluster only; on the HUD: top of the map)"
         ]
       ]
     },

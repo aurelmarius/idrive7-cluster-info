@@ -32,7 +32,10 @@ const HUD_VISIBLE_RIGHT = 680;   // the HUD shows up to x ~683 (a park's fill in
 // the lowest the HUD shows (scene pixels): the standard map's bottom edge, where the panel always showed (G05);
 // the panel and its thin kW bar are held above it, wherever the HUD map is moved
 const HUD_VISIBLE_BOTTOM = 400;
-const HUD_RIGHT_GAP = 4;        // HUD: the panel's gap from the right edge of what the HUD shows
+const HUD_RIGHT_GAP = 4;
+// place 'cluster': the top middle of the whole cluster, where a hybrid's eDrive logo is (panel target, 1920x720;
+// estimated from photos of a G20 330e's cluster, the logo's middle at about y 75: the nudges fine-tune it)
+const CLUSTER_TOP_Y = 40;        // HUD: the panel's gap from the right edge of what the HUD shows
 const HUD_SPEED_CLEAR = 405;     // left edge limit: the speed readout ends at x ~331 and Waze's car icon at ~400 (85 % map, G05)
 const HUD_MAX_H = 60;             // the HUD panel's height at most (the room right of the speed limits it first)
 const HUD_MAX_PCT = 85;           // the HUD map's widest (waze-on-cluster hud_width_pct)
@@ -139,6 +142,7 @@ function underStrip(h) {
  *  was, the layer reaches up over it). */
 function badgeRect(r, where, target, extras, hasPower, underOn) {
     if (hasPower === undefined) hasPower = true;      // true: the kW and its bar, 'number': the kW alone, false: neither
+    if (where === 'cluster' && target !== 'panel') where = 'top';   // (the top of the cluster: only on the whole cluster)
     // the HUD's size to its map's width; on the cluster 1.3 times it (72 high), read at a glance past the wheel;
     // each extra value (a temperature) adds a column EXTRA_COL times the height wide
     let s = target === 'hud' ? Math.max(0.62, Math.min(HUD_MAX_H / 56, r.w / 400)) : 1.3;   // (HUD: up to HUD_MAX_H high)
@@ -165,6 +169,9 @@ function badgeRect(r, where, target, extras, hasPower, underOn) {
     const m = target === 'hud' ? 4 : 32;   // (HUD: its digits on the speed readout's line; cluster: clear of the dimmed edge below)
     const ph = h;
     h = ph + (underOn ? underStrip(ph).total : 0);
+    if (where === 'cluster' && target === 'panel') {
+        return { x: Math.floor((SCENES.panel[0] - w) / 2), y: CLUSTER_TOP_Y, w, h, ph };
+    }
     let y = where === 'top' ? r.y + m : r.y + r.h - h - m;
     if (target === 'hud') y = Math.max(0, Math.min(y, HUD_VISIBLE_BOTTOM - h));
     let x = r.x + Math.floor((r.w - w) / 2);
@@ -330,7 +337,7 @@ function startOverlay(ctx, lv, opts) {
         // the map in the cluster's middle (map, 1088x480), the panel drawn on the whole cluster (setting clusterLayer
         // 'panel': 1920x720 over the gauges, transparent around the panel, as the TVH card is): the same place over
         // the map, and moved by the nudge past it, up to the top of the cluster (where eDrive's logo is)
-        const tg = map.target === 'map' && settings.get('clusterLayer') === 'panel' ? 'panel' : map.target;
+        const tg = map.target === 'map' && (settings.get('clusterLayer') === 'panel' || where() === 'cluster') ? 'panel' : map.target;
         return { target: tg, pct: map.pct, hx: map.hx, hy: map.hy };
     };
     let CR = opts.ClusterRender;
@@ -518,4 +525,4 @@ function startOverlay(ctx, lv, opts) {
     };
 }
 
-module.exports = { startOverlay, mapRect, badgeRect, nudge, drawBadge, drawArrow, changed, parseStatus, underStrip };
+module.exports = { CLUSTER_TOP_Y, startOverlay, mapRect, badgeRect, nudge, drawBadge, drawArrow, changed, parseStatus, underStrip };

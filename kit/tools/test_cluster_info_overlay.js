@@ -203,7 +203,16 @@ class FakeCR extends EventEmitter {
     });
     settings.v.nudgeY = '-999'; t += 300; ov._tick();
     check('nudged too far: held at the top of the cluster', () => assert.strictEqual([...cr.layers.values()][0].y, 0));
-    settings.v.clusterLayer = 'map'; settings.v.nudgeY = 0; settings.v.nudgeX = 0;
+    settings.v.clusterLayer = 'map'; settings.v.nudgeY = 0; settings.v.place = 'cluster'; t += 300; ov._tick();
+    check('place "top of the cluster": on the whole cluster, centred at the top (eDrive\'s logo), whatever the layer setting', () => {
+        const l = [...cr.layers.values()][0];
+        assert.strictEqual(l.target, 'panel');
+        assert.strictEqual(l.y, 40);
+        assert.strictEqual(l.x + l.w / 2, 960, JSON.stringify(l));
+    });
+    settings.v.nudgeY = '-16'; t += 300; ov._tick();
+    check('... and nudged from there', () => assert.strictEqual([...cr.layers.values()][0].y, 24));
+    settings.v.nudgeY = 0; settings.v.nudgeX = 0;
     settings.v.place = 'bottom'; t += 300; ov._tick();
     settings.v.show = 'hud'; t += 300; ov._tick();
     check('Always on the HUD, the map on the cluster: the panel where it is with the map on the HUD (its 70 % size), not moved up', () => {
