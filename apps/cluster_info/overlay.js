@@ -333,6 +333,9 @@ function startOverlay(ctx, lv, opts) {
     const place = () => {
         // (the HUD size chosen in Waze on cluster, even while its map is on the cluster: the panel stays put)
         if (onHud()) return { target: 'hud', pct: map.pct, hx: map.hx, hy: map.hy };
+        // always on the cluster (setting show 'cluster'): on the whole cluster, with Waze's map there or not, in the
+        // map's place or at the top (place 'cluster'), while the car is on and there is something to show
+        if (settings.get('show') === 'cluster') return lv.off && lv.off() ? null : { target: 'panel', pct: map.pct, hx: map.hx, hy: map.hy };
         if (!map.showing) return null;
         // the map in the cluster's middle (map, 1088x480), the panel drawn on the whole cluster (setting clusterLayer
         // 'panel': 1920x720 over the gauges, transparent around the panel, as the TVH card is): the same place over

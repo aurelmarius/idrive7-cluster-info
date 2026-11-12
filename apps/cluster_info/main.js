@@ -195,6 +195,8 @@ mgu.run({
             /* power asked for with the battery's charge or temperature too: cauliflowermossgrape's eDrive (the one that
              * reads a G20 330e's battery) writes its file here only while power is wanted, values or not (Nov 2026) */
             keepFast() { if (!awake.off()) providers.want({ power: slots().indexOf('power') >= 0 || (settings.get('underline') || 'off') !== 'off' || chosen().some((k) => BATTERY_VALUES.indexOf(k) >= 0), values: chosen() }); },
+            /** The car switched off (kit/awake.js): the panel always on the cluster goes. */
+            off: () => awake.off(),
             indicator: () => live.indicator,
             night: () => live.night === true,
         };

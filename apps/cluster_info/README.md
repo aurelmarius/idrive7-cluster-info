@@ -13,7 +13,8 @@ A small panel of live values over the Waze map in the instrument cluster or on t
   whenever the battery's charge or temperature is chosen, with or without the kW meter. Any app can add values the same way. Optionally (Settings > Thin kW bar along the
   bottom) a slim centre-zero kW bar runs just under the panel, clear of its values, the width of all three
   slots (whether or not one of them is the kW meter): use to the right, recuperation to the left in green.
-- **Where:** where the Waze map is (cluster or HUD), or always on the HUD; at the bottom or top of the map, or
+- **Where:** where the Waze map is (cluster or HUD), always on the HUD, or always on the cluster (on the whole
+  cluster, with Waze's map there or not, while the car is on); at the bottom or top of the map, or
   at the top middle of the cluster, where a hybrid's eDrive logo is (on the whole cluster, as below).
   On the cluster it can be moved further, up (to 160 px) / down (to 64 px) and left / right (to 160 px)
   (Settings > Panel on the cluster: up / down, left / right). Drawn in the map's area (the default) it stays

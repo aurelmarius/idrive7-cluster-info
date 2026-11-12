@@ -60,6 +60,10 @@
           "Always on the HUD"
         ],
         [
+          "cluster",
+          "Always on the cluster (with or without the Waze map)"
+        ],
+        [
           "off",
           "Off"
         ]

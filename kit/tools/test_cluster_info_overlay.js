@@ -108,7 +108,8 @@ class FakeCR extends EventEmitter {
     const log = { info: (m) => logs.push(m), warn: (m) => logs.push('WARN ' + m) };
     let kw = 18, fast = 0, t = 1e6;
     let ind = 'off';
-    const lv = { power: () => (kw === null ? null : pw(kw)), limits: () => ({ outMax: 100, inMax: 60 }), keepFast: () => { fast++; }, indicator: () => ind, night: () => night, extras: () => extras };
+    const lv = { power: () => (kw === null ? null : pw(kw)), limits: () => ({ outMax: 100, inMax: 60 }), keepFast: () => { fast++; }, indicator: () => ind, night: () => night, extras: () => extras, off: () => carOff };
+    let carOff = false;
     let night = false, extras = [];
     const wait = (ms) => new Promise((r) => setTimeout(r, ms || 30));
     const ov = startOverlay({ settings, log, theme: () => theme }, lv, { statusPath: status, ClusterRender: FakeCR, now: () => t, setInterval: () => 0, clearInterval: () => {} });
@@ -212,6 +213,25 @@ class FakeCR extends EventEmitter {
     });
     settings.v.nudgeY = '-16'; t += 300; ov._tick();
     check('... and nudged from there', () => assert.strictEqual([...cr.layers.values()][0].y, 24));
+    write({ state: 'waiting', target: 'map', hud_width_pct: 70 });
+    await step();
+    settings.v.nudgeY = 0; t += 300; ov._tick();
+    check('Waze\'s map gone, place top of the cluster but shown with the map: hidden', () => assert.strictEqual(ov.shown(), false));
+    settings.v.show = 'cluster'; t += 300; ov._tick();
+    check('Always on the cluster: shown without the map, at the top of the whole cluster', () => {
+        const l = [...cr.layers.values()][0];
+        assert(ov.shown()); assert.strictEqual(l.target, 'panel'); assert.strictEqual(l.y, 40);
+    });
+    settings.v.place = 'bottom'; t += 300; ov._tick();
+    check('... in the map\'s place with bottom', () => {
+        const l = [...cr.layers.values()][0], b = badgeRect(mapRect('panel', 0), 'bottom', 'panel', 0, true);
+        assert(ov.shown()); assert.strictEqual(l.target, 'panel'); assert.strictEqual(l.y, b.y);
+    });
+    carOff = true; t += 300; ov._tick();
+    check('... and gone once the car is switched off', () => assert.strictEqual(ov.shown(), false));
+    carOff = false; settings.v.show = 'map';
+    write({ state: 'showing', target: 'map', hud_width_pct: 70 });
+    await step();
     settings.v.nudgeY = 0; settings.v.nudgeX = 0;
     settings.v.place = 'bottom'; t += 300; ov._tick();
     settings.v.show = 'hud'; t += 300; ov._tick();
